@@ -1,0 +1,103 @@
+using namespace std;
+//自己实现树的各种算法
+struct BinaryTreeNode {//树节点
+	int value;
+	BinaryTreeNode* left;
+	BinaryTreeNode* right;
+};
+//下面是三种树的遍历方法
+void InOrder(BinaryTreeNode* root) {//中序遍历
+	if (root != NULL) {
+		InOrder(root->left);
+		cout << root->value << endl;
+		InOrder(root->right);
+	}
+}
+void PreOrder(BinaryTreeNode* root) {//前序遍历
+	if (root != NULL) {
+		cout << root->value << endl;
+		PreOrder(root->left);
+		PreOrder(root->right);
+	}
+}
+void PostOrder(BinaryTreeNode* root) {//后序遍历
+	if (root != NULL) {
+		PostOrder(root->left);
+		PostOrder(root->right);
+		cout << root->value << endl;
+	}
+}
+//下面是根据遍历结果构造树的方法。对于一棵树来说，如果要完全确定形态，一定需要知道中序遍历
+//和另外一种遍历方法。只知道前序遍历和后序遍历，没法完全确定一棵树的形态
+BinaryTreeNode* Contruct(int* preorder, int* inorder, int length) {//根据前序和中序遍历，构造树，返回树的根节点，length是树的节点总数
+	if (preorder == NULL || inorder == NULL || length <= 0)
+		return NULL;
+	return ConstructCore(preorder, preorder + length - 1, inorder, inorder + length - 1);
+}
+BinaryTreeNode* ConstructCore(int* startPreorder, int* endPreorder, int* startInorder, int* endInorder) {//要构造树，必须分开左子树和右子树构造
+	int rootvalue = startPreorder[0];//先从前序遍历开始，先找到根节点
+	BinaryTreeNode* root = new BinaryTreeNode();//先把根节点创建了
+	root->value = rootvalue;
+	root->left = root->right = NULL;
+
+	if (*startPreorder == *endPreorder) //在这个时候可以返回了
+		return root;
+	
+	int* rootinorder = startInorder;//接下来需要在中序遍历中找到根节点
+	while (*rootinorder != rootvalue)//这个时候rootinorder中就是中序遍历中的根节点了
+		++rootinorder;
+	int leftlength = rootinorder - startInorder;
+	int *leftpreorderend = startPreorder + leftlength;
+	root->left = ConstructCore(startPreorder + 1, leftpreorderend, startInorder, rootinorder - 1);
+	root->right = ConstructCore(leftpreorderend + 1, endPreorder, rootinorder + 1, endInorder);
+	return root;
+}
+//二叉树有普通二叉树，二叉排序树，下面的操作是按照二叉排序树。因为例如查找等，如果不是二叉排序树，纯粹只是
+//各种遍历罢了，其查找也没啥意义。如果是二叉排序树，就可以按照顺序进行查找、添加、删除等操作
+void Add(BinaryTreeNode* root, int value) {
+	if (root == NULL) {//如果是空树，那当然直接插入作为根节点了
+		BinaryTreeNode* node = new BinaryTreeNode();
+		node->value = value;
+		node->left = node->right = NULL;
+		root = node;
+		return;
+	}
+	BinaryTreeNode* current = root;
+	if (current->value >= value)//此时value值应该放在节点左侧
+		return Add(current->left, value);
+	else
+		return Add(current->right, value);//value值放在节点右侧
+}
+BinaryTreeNode* Find(BinaryTreeNode* root, int key) {//其实隐含的是用前序遍历来找数据
+	if (root == NULL) 
+		return NULL;
+	if (root->value == key)
+		return root;
+	if (root->value > key)
+		return Find(root->left, key);
+	else
+		return Find(root->right, key);
+}
+void Delete(BinaryTreeNode* root, int key) {//删除的是前序遍历时候找到的第一个数据
+	//这里不能用上面的Find函数，因为Find返回的是该节点，但是这里要进行删除，没法对上面的节点进行连接
+	if (root == NULL)
+		return;
+	if (root->value == key) {//根节点是需要删除的节点
+		if (root->left == NULL&&root->right != NULL) {
+			BinaryTreeNode* current = root;
+			root = root->right;
+			delete current;
+		}
+		if (root->left != NULL&&root->right == NULL) {
+			BinaryTreeNode* current = root;
+			root = root->left;
+			delete current;
+		}
+		if (root->left == NULL&&root->right == NULL)
+			delete root;
+	}
+	if (root->value > key)
+		Delete(root->left, key);
+	else
+		Delete(root->right, key);
+}
