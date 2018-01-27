@@ -78,26 +78,5 @@ BinaryTreeNode* Find(BinaryTreeNode* root, int key) {//其实隐含的是用前�
 	else
 		return Find(root->right, key);
 }
-void Delete(BinaryTreeNode* root, int key) {//删除的是前序遍历时候找到的第一个数据
-	//这里不能用上面的Find函数，因为Find返回的是该节点，但是这里要进行删除，没法对上面的节点进行连接
-	if (root == NULL)
-		return;
-	if (root->value == key) {//根节点是需要删除的节点
-		if (root->left == NULL&&root->right != NULL) {
-			BinaryTreeNode* current = root;
-			root = root->right;
-			delete current;
-		}
-		if (root->left != NULL&&root->right == NULL) {
-			BinaryTreeNode* current = root;
-			root = root->left;
-			delete current;
-		}
-		if (root->left == NULL&&root->right == NULL)
-			delete root;
-	}
-	if (root->value > key)
-		Delete(root->left, key);
-	else
-		Delete(root->right, key);
-}
+void Delete(BinaryTreeNode* root, int key) //删除操作是相当复杂的，需要进行旋转等
+	
