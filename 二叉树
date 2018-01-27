@@ -78,5 +78,10 @@ BinaryTreeNode* Find(BinaryTreeNode* root, int key) {//其实隐含的是用前�
 	else
 		return Find(root->right, key);
 }
-void Delete(BinaryTreeNode* root, int key) //删除操作是相当复杂的，需要进行旋转等
-	
+void Delete(BinaryTreeNode* root, int key) //删除操作是相当复杂的，分三种情况
+1、被删节点没有子节点：那这样直接删除即可
+2、被删节点有一个子节点：把被删节点的父节点与他的连接连接到被删节点的子节点即可，无论左右
+3、被删节点有两个子节点：
+（1）先找到该被删节点的后继节点，用该后继节点的内容代替掉被删节点的内容
+（2）删掉后继节点（使用1和2的方法。因为后继节点不可能有两个子节点）
+某节点的后继节点，即该节点的右子树进行中序遍历得到的第一个节点
