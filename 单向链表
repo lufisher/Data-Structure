@@ -1,0 +1,85 @@
+#include "stdafx.h"
+#include<iostream>
+#include<stack>
+
+using namespace std;
+//自己实现单向链表的各种算法
+struct ListNode {//链表结构
+	int value;
+	ListNode* next;
+};
+
+void ReadInOrder(ListNode** head) {//从头到尾遍历和打印链表
+		if (head == NULL || *head == NULL)
+			return;
+		else {
+			ListNode* node = *head;
+			while (node != NULL) {
+				cout << node->value << endl;
+				node = node->next;
+			}
+		}
+}
+
+void ReadCounterOrder(ListNode** head) {//反顺序遍历和打印链表，需要借助栈
+	if (head == NULL || *head == NULL)
+		return;
+	else {
+		stack<ListNode*> nodes;
+		ListNode* node = *head;
+		while (node != NULL) {
+			nodes.push(node);
+			node = node->next;
+		}
+		while (!nodes.empty()) {
+			node = nodes.top();
+			cout << node->value << endl;
+			nodes.pop();
+		}
+	}
+}
+
+void AddtoTail(ListNode** head, int value) {//在尾插入节点，第一个参数需要用指针的指针。注意这里
+	//头节点就是链表第一个数据，不用空头节点
+	ListNode* pnew = new ListNode();//这个是需要插入的新节点
+	pnew->value = value;
+	pnew->next = NULL;
+
+	if (head == NULL || *head == NULL)//如果头节点是空或者根本没有这个链表，意
+		//味着链表是空的，那这样新插入的节点就是头结点。一般链表的操作都需要有这步判断
+		*head = pnew;
+	else {//如果头节点不空
+		ListNode* node = *head;//需要创建一个新的节点node，用来从头节点往下遍历，找到链表最尾端
+		while (node->next != NULL) {//找到尾部后，把新节点加上即可
+			node = node->next;
+		}
+		node->next = pnew;
+	}
+}
+
+void RemoveNode(ListNode** head, int value) {//找到链表中第一个值为value的节点并删除
+	if (head == NULL || *head == NULL)//如果根本没这个链表或者链表是空，那当然都没什么操作了
+		return;
+	else {
+		ListNode* tobedelete = NULL;//这个新的node是用来标记住需要删除的那个节点，函数最后进行删除
+		if ((*head)->value = value) {//如果头节点就是那个要找的值。头节点是要单独拿出来分析的
+			tobedelete = *head;
+			*head = (*head)->next;
+		}
+		else {
+			ListNode* node = *head;//这个node是用来循迹的，用来找到合适的value节点的前一个节点
+			while (node->next != NULL && node->next->value != value)
+				node = node->next;
+			//完成了上面这步后，有两种可能：node指向最后一个节点，没找到value，或者指向了符合的value的前一个
+			//第一种情况，不需要处理
+			if (node->next != NULL&&node->next->value == value) {//第二种情况的处理
+				tobedelete = node->next;
+				node->next = node->next->next;
+			}
+			if (tobedelete != NULL) {
+				delete tobedelete;
+				tobedelete = NULL;
+			}
+		}
+	}
+}
